@@ -1,8 +1,11 @@
 import { useState } from 'react';
+import { Routes, Route } from 'react-router-dom';
 import { mockInventoryData } from '../data/inventory';
 import { InventoryItem } from '../types/inventory';
-import { CategorySection } from '../components/CategorySection';
-import { StockSummary } from '../components/StockSummary';
+import Home from './Home';
+import ShoppingList from './ShoppingList';
+import InventoryManagement from './InventoryManagement';
+import StockCheck from './StockCheck';
 
 const Index = () => {
   const [inventory, setInventory] = useState<InventoryItem[]>(mockInventoryData);
@@ -15,48 +18,41 @@ const Index = () => {
     );
   };
 
-  const freshItems = inventory.filter(item => item.category === 'fresh');
-  const vegetableItems = inventory.filter(item => item.category === 'vegetables');
-  const otherItems = inventory.filter(item => item.category === 'others');
+  const handleUpdateInventory = (newInventory: InventoryItem[]) => {
+    setInventory(newInventory);
+  };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        <header className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-foreground mb-2">
-            ระบบเช็คสต๊อกวัตถุดิบ
-          </h1>
-          <p className="text-muted-foreground">
-            ร้านหมูกระทะ - จัดการวัตถุดิบอย่างมีประสิทธิภาพ
-          </p>
-        </header>
-
-        <StockSummary items={inventory} />
-
-        <div className="space-y-8">
-          <CategorySection
-            title="ของสด"
-            icon="🥩"
-            items={freshItems}
+    <Routes>
+      <Route path="/" element={<Home inventory={inventory} />} />
+      <Route 
+        path="/shopping-list" 
+        element={
+          <ShoppingList 
+            inventory={inventory} 
+            onUpdateInventory={handleUpdateInventory}
+          />
+        } 
+      />
+      <Route 
+        path="/inventory" 
+        element={
+          <InventoryManagement 
+            inventory={inventory} 
             onUpdateStock={handleUpdateStock}
           />
-
-          <CategorySection
-            title="ผัก"
-            icon="🥬"
-            items={vegetableItems}
-            onUpdateStock={handleUpdateStock}
+        } 
+      />
+      <Route 
+        path="/stock-check" 
+        element={
+          <StockCheck 
+            inventory={inventory} 
+            onUpdateInventory={handleUpdateInventory}
           />
-
-          <CategorySection
-            title="อื่นๆ"
-            icon="🍯"
-            items={otherItems}
-            onUpdateStock={handleUpdateStock}
-          />
-        </div>
-      </div>
-    </div>
+        } 
+      />
+    </Routes>
   );
 };
 
